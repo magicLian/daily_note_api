@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	DailyNoteExist       = errors.New("daily note exist")
+	DailyNoteExist       = errors.New("daily note already exist")
 	DailyNoteParseFailed = errors.New("daily note parse failed")
 )
 

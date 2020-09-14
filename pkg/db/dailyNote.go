@@ -3,6 +3,7 @@ package db
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/jinzhu/gorm"
 	"ml_daily_record/pkg/models"
 	"time"
 )
@@ -116,11 +117,11 @@ func (pg *PGService) ExistDailyNote(dn *models.DailyNote) (bool, error) {
 		sql += fmt.Sprintf("date = '%s'", dn.Date)
 	}
 	dnQuery := &models.DailyNote{}
-	if err := pg.Connection.Where(sql).First(dnQuery); err != nil {
-		if err.RecordNotFound() {
+	if err := pg.Connection.Where(sql).First(dnQuery).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
 			return false, nil
 		} else {
-			return false, err.Error
+			return false, err
 		}
 	}
 	if dnQuery.ID == "" {
