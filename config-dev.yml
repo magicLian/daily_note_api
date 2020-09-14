@@ -1,0 +1,15 @@
+deploy: "dev"
+
+server:
+  port: 8082
+  domain: 127.0.0.1
+
+db:
+  postgres:
+    host: 127.0.0.1
+    port: 5432
+    username: admin
+    password: postgres
+    dbname: daily_record
+    minPoolSize: 10
+    maxPoolSize: 30
