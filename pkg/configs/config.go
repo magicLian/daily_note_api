@@ -40,15 +40,20 @@ type postgres struct {
 }
 
 type server struct {
-	Port     string `yaml:"port" required:"true"`
-	Domain   string `yaml:"domain" required:"true"`
+	Port   string `yaml:"port" required:"true"`
+	Domain string `yaml:"domain" required:"true"`
 }
 
+type jwt struct {
+	ExpiredDays int    `yaml:"expiredDays" required:"true"`
+	Secret      string `yaml:"secret" required:"true"`
+}
 
 type Conf struct {
-	Db          db          `yaml:"db" required:"true"`
-	Server      server      `yaml:"server" required:"true"`
-	Deploy      string      `yaml:"deploy" required:"true"`
+	Db     db     `yaml:"db" required:"true"`
+	Server server `yaml:"server" required:"true"`
+	Deploy string `yaml:"deploy" required:"true"`
+	Jwt    jwt    `yaml:"jwt" required:"true"`
 }
 
 func getConf() *Conf {

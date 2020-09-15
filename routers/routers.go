@@ -4,6 +4,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"ml_daily_record/pkg/configs"
 	"ml_daily_record/pkg/controllers"
+	"ml_daily_record/pkg/middleware"
 
 	//"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
@@ -26,7 +27,13 @@ func InitRouter() *gin.Engine {
 
 	v1 := router.Group("/v1")
 
-	dn := v1.Group("/dailyNotes")
+	auth := v1.Group("/auth")
+	{
+		authC := new(controllers.AuthC)
+		auth.POST("/native", authC.AuthNative)
+	}
+
+	dn := v1.Group("/dailyNotes", middleware.TokenAuth)
 	{
 		dnC := new(controllers.DailyNoteC)
 		dn.POST("", dnC.CreateDailyNote)

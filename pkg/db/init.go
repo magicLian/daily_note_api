@@ -41,7 +41,7 @@ func InitPg() {
 		log.Fatalf("Fail to connect pg: %v\n", err)
 	}
 
-	x.LogMode(false)
+	x.LogMode(true)
 	x.SingularTable(true)
 	x.DB().SetMaxIdleConns(configs.Cf.Db.Postgres.MinPoolSize)
 	x.DB().SetMaxOpenConns(configs.Cf.Db.Postgres.MaxPoolSize)
@@ -62,6 +62,7 @@ func InitPg() {
 }
 
 func initTable(x *gorm.DB) {
+	x.AutoMigrate(&models.User{})
 	x.AutoMigrate(&models.DailyNote{})
 }
 

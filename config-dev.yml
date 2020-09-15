@@ -13,3 +13,7 @@ db:
     dbname: daily_note
     minPoolSize: 10
     maxPoolSize: 30
+
+jwt:
+  expiredDays: 3
+  secret: "magiclianhostonly666"
