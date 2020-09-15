@@ -15,7 +15,6 @@ type User struct {
 	Password        string     `json:"password"`
 	Age             int        `json:"age" gorm:"type:varchar(5)"`
 	LastLoginTime   *time.Time `json:"lastLoginTime"`
-	TokenUid        string     `json:"tokenUid"`
 	Token           string     `json:"token"`
 	TokenCreateTime *time.Time `json:"tokenCreateTime"`
 	CreatedAt       time.Time  `json:"createdAt"`
@@ -24,9 +23,8 @@ type User struct {
 }
 
 type TokenUser struct {
-	Id            string     `json:"id" gorm:"type:varchar(50);primary_key"`
-	Username      string     `json:"username" gorm:"type:varchar(50)"`
-	Password      string     `json:"password"`
-	Age           int        `json:"age" gorm:"type:varchar(5)"`
+	Id            string     `json:"id"`
+	Username      string     `json:"username"`
+	Age           int        `json:"age"`
 	LastLoginTime *time.Time `json:"lastLoginTime"`
 }

@@ -28,7 +28,6 @@ func AuthNative(an *models.AuthNative) (string, error) {
 	tokenUser := &models.TokenUser{
 		Id:            userQuery.Id,
 		Username:      userQuery.Username,
-		Password:      userQuery.Password,
 		Age:           userQuery.Age,
 		LastLoginTime: userQuery.LastLoginTime,
 	}

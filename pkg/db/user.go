@@ -29,7 +29,6 @@ func (pg *PGService) FindUserByUsernameAndPassword(uname string, passwd string) 
 
 func (pg *PGService) UpdateUserToken(user *models.User) error {
 	if err := pg.Connection.Model(&user).Where("id = ?", user.Id).Updates(map[string]interface{}{
-		"token_uid":         user.TokenUid,
 		"token":             user.Token,
 		"token_create_time": user.TokenCreateTime,
 		"last_login_time":   user.LastLoginTime,
