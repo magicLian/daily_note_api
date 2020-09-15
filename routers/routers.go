@@ -36,7 +36,10 @@ func InitRouter() *gin.Engine {
 	dn := v1.Group("/dailyNotes", middleware.TokenAuth)
 	{
 		dnC := new(controllers.DailyNoteC)
+		dn.GET("", dnC.GetDailyNotes)
 		dn.POST("", dnC.CreateDailyNote)
+		dn.PUT("/:id", dnC.UpdateDailyNote)
+		dn.DELETE("/:id", dnC.DeleteDailyNote)
 	}
 
 	return router

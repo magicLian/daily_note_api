@@ -1,11 +1,10 @@
 package db
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/jinzhu/gorm"
 	"ml_daily_record/pkg/models"
-	"time"
+	"strings"
 )
 
 type DailyNoteDao interface {
@@ -15,7 +14,7 @@ type DailyNoteDao interface {
 	BatchUpdateDailyNotes([]*models.DailyNote) error
 	DeleteDailyNote(string) error
 	FindDailyNoteById(string) (*models.DailyNote, error)
-	FindDailyNoteByDateDuration(time.Time, time.Time) ([]*models.DailyNote, error)
+	FindDailyNoteByFilter(*models.DailyNoteQueryReq) ([]*models.DailyNote, error)
 	ExistDailyNote(*models.DailyNote) (bool, error)
 }
 
@@ -84,11 +83,22 @@ func (pg *PGService) FindDailyNoteById(id string) (*models.DailyNote, error) {
 	return dn, nil
 }
 
-func (pg *PGService) FindDailyNoteByDateDuration(from time.Time, to time.Time) ([]*models.DailyNote, error) {
-	sql := fmt.Sprintf("date between TIMESTAMP '%s' and TIMESTAMP '%s'", from.String(), to.String())
+func (pg *PGService) FindDailyNoteByFilter(filter *models.DailyNoteQueryReq) ([]*models.DailyNote, error) {
+	sql := ""
+
+	if filter.From != "" && filter.To != "" {
+		sql += fmt.Sprintf("date between '%s' and  '%s'", filter.From, filter.To)
+	}
+	if filter.Type != "" {
+		if sql != "" {
+			sql += " and "
+		}
+		sql += fmt.Sprintf("'%s' = ANY(string_to_array(type_str,','))", filter.Type)
+	}
+
 	dailyNotes := make([]*models.DailyNote, 0)
 
-	if err := pg.Connection.Where(sql).Find(&dailyNotes); err != nil {
+	if err := pg.Connection.Where(sql).Find(&dailyNotes); err.Error != nil {
 		if err.RecordNotFound() {
 			return nil, nil
 		} else {
@@ -133,24 +143,21 @@ func (pg *PGService) ExistDailyNote(dn *models.DailyNote) (bool, error) {
 
 func changeDailyNoteToStruct(dn *models.DailyNote) error {
 	if dn.TypeStr != "" {
-		typeArr := make([]string, 0)
-		if err := json.Unmarshal([]byte(dn.TypeStr), &typeArr); err != nil {
-			return err
-		}
-
-		dn.Type = typeArr
+		dn.Type = strings.Split(dn.TypeStr, ",")
 	}
 
 	return nil
 }
 
 func changeDailyNoteToString(dn *models.DailyNote) error {
-	typeBytes, err := json.Marshal(dn.Type)
-	if err != nil {
-		return err
+	dn.TypeStr = ""
+	for i, t := range dn.Type {
+		if i == 0 {
+			dn.TypeStr += t
+		} else {
+			dn.TypeStr += "," + t
+		}
 	}
-
-	dn.TypeStr = string(typeBytes)
 
 	return nil
 }

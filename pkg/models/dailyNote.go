@@ -7,8 +7,12 @@ import (
 )
 
 var (
-	DailyNoteExist       = errors.New("daily note already exist")
-	DailyNoteParseFailed = errors.New("daily note parse failed")
+	DailyNoteExist              = errors.New("daily note already exist")
+	DailyNoteParseFailed        = errors.New("daily note parse failed")
+	DailyNoteIdNotFound         = errors.New("daily note id not found")
+	DailyNoteNotFound           = errors.New("daily note not found")
+	DailyNoteUpdateConfict      = errors.New("daily note update confict")
+	DailyQueryParametersInvaild = errors.New("daily note query parameters invaild")
 )
 
 type DailyNote struct {
@@ -28,4 +32,10 @@ type DailyNote struct {
 type PeriodData struct {
 	IsStart bool `json:"isStart"`
 	IsEnd   bool `json:"isEnd"`
+}
+
+type DailyNoteQueryReq struct {
+	From string `json:"from"`
+	To   string `json:"to"`
+	Type string `json:"type"`
 }
