@@ -8,11 +8,28 @@ import (
 
 type UserDao interface {
 	FindUserByUsernameAndPassword(string, string) (*models.User, error)
+	FindUserByUsernameAndToken(string, string) (*models.User, error)
 	UpdateUserToken(*models.User) error
 }
 
-func (pg *PGService) FindUserByUsernameAndPassword(uname string, passwd string) (*models.User, error) {
-	sql := fmt.Sprintf("username = '%s' and password = '%s'", uname, util.EncodeToSHA256(passwd))
+func (pg *PGService) FindUserByUsernameAndPassword(username, passwd string) (*models.User, error) {
+	sql := fmt.Sprintf("username = '%s' and password = '%s'", username, util.EncodeToSHA256(passwd))
+	userQuery := &models.User{}
+	if err := pg.Connection.Where(sql).First(&userQuery); err.Error != nil {
+		if err.RecordNotFound() {
+			return nil, nil
+		} else {
+			return nil, err.Error
+		}
+	}
+	if userQuery.Id == "" {
+		return nil, nil
+	}
+	return userQuery, nil
+}
+
+func (pg *PGService) FindUserByUsernameAndToken(username, token string) (*models.User, error) {
+	sql := fmt.Sprintf("username = '%s' and token = '%s'", username, token)
 	userQuery := &models.User{}
 	if err := pg.Connection.Where(sql).First(&userQuery); err.Error != nil {
 		if err.RecordNotFound() {

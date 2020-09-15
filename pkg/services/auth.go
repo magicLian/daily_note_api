@@ -5,6 +5,8 @@ import (
 	"ml_daily_record/pkg/configs"
 	"ml_daily_record/pkg/db"
 	"ml_daily_record/pkg/models"
+	"ml_daily_record/pkg/util"
+	"strconv"
 	"time"
 )
 
@@ -49,7 +51,7 @@ func AuthNative(an *models.AuthNative) (string, error) {
 func CreateToken(tokenUser *models.TokenUser, secret string) (string, error) {
 	expiredDuation := time.Second * time.Duration(configs.Cf.Jwt.ExpiredDays) * 3600 * 24
 	at := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"exp":  time.Now().Add(expiredDuation).Unix(),
+		"exp":  strconv.FormatInt(time.Now().Add(expiredDuation).Unix(), 10),
 		"user": tokenUser,
 	})
 	token, err := at.SignedString([]byte(secret))
@@ -59,16 +61,28 @@ func CreateToken(tokenUser *models.TokenUser, secret string) (string, error) {
 	return token, nil
 }
 
-func ParseToken(token string, secret string) (string, error) {
+func ParseToken(token string, secret string) (map[string]interface{}, error) {
 	claim, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
 		return []byte(secret), nil
 	})
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return claim.Claims.(jwt.MapClaims)["uid"].(string), nil
+	return claim.Claims.(jwt.MapClaims), nil
 }
 
-func IsTokenExpired(tokenCreatedAt *time.Time) bool {
-	return false
+func IsTokenExpired(expiredTimestamp string) (bool, error) {
+	if expiredTimestamp == "" {
+		return false, models.AuthTokenExpired
+	}
+	expiredInt, err := strconv.ParseInt(expiredTimestamp, 10, 64)
+	if err != nil {
+		return false, err
+	}
+	expiredAt := util.ParseFromInt64(expiredInt)
+	expiredDuration := time.Second * time.Duration(configs.Cf.Jwt.ExpiredDays) * 3600 * 24
+	if expiredAt.Before(time.Now().Add(-expiredDuration)) {
+		return false, models.AuthTokenExpired
+	}
+	return true, nil
 }
