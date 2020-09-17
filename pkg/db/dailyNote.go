@@ -9,10 +9,12 @@ import (
 
 type DailyNoteDao interface {
 	CreateDailyNote(*models.DailyNote) error
+	CreateDailyNoteWithTx(*gorm.DB, *models.DailyNote) error
 	BatchCreateDailyNotes([]*models.DailyNote) error
-	UpdateDailyNote(*models.DailyNote) error
-	BatchUpdateDailyNotes([]*models.DailyNote) error
-	DeleteDailyNote(string) error
+	UpdateDailyNoteWithTx(*gorm.DB, *models.DailyNote) error
+	BatchUpdateDailyNotesWithTx(*gorm.DB, []*models.DailyNote) error
+	DeleteDailyNoteByIdWithTx(*gorm.DB, string) error
+	BatchDeleteDailyNoteByIdWithTx(*gorm.DB, []string) error
 	FindDailyNoteById(string) (*models.DailyNote, error)
 	FindDailyNoteByFilter(*models.DailyNoteQueryReq) ([]*models.DailyNote, error)
 	ExistDailyNote(*models.DailyNote) (bool, error)
@@ -28,6 +30,16 @@ func (pg *PGService) CreateDailyNote(dn *models.DailyNote) error {
 	return nil
 }
 
+func (pg *PGService) CreateDailyNoteWithTx(tx *gorm.DB, dn *models.DailyNote) error {
+	if err := changeDailyNoteToString(dn); err != nil {
+		return err
+	}
+	if err := tx.Create(&dn).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
 func (pg *PGService) BatchCreateDailyNotes(dns []*models.DailyNote) error {
 	for _, dn := range dns {
 		if err := pg.CreateDailyNote(dn); err != nil {
@@ -38,20 +50,20 @@ func (pg *PGService) BatchCreateDailyNotes(dns []*models.DailyNote) error {
 	return nil
 }
 
-func (pg *PGService) UpdateDailyNote(dn *models.DailyNote) error {
+func (pg *PGService) UpdateDailyNoteWithTx(tx *gorm.DB, dn *models.DailyNote) error {
 	if err := changeDailyNoteToString(dn); err != nil {
 		return err
 	}
-	if err := pg.Connection.Update(&dn).Error; err != nil {
+	if err := tx.Update(&dn).Error; err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (pg *PGService) BatchUpdateDailyNotes(dns []*models.DailyNote) error {
+func (pg *PGService) BatchUpdateDailyNotesWithTx(tx *gorm.DB, dns []*models.DailyNote) error {
 	for _, dn := range dns {
-		if err := pg.UpdateDailyNote(dn); err != nil {
+		if err := pg.UpdateDailyNoteWithTx(tx, dn); err != nil {
 			return err
 		}
 	}
@@ -59,9 +71,19 @@ func (pg *PGService) BatchUpdateDailyNotes(dns []*models.DailyNote) error {
 	return nil
 }
 
-func (pg *PGService) DeleteDailyNote(id string) error {
-	if err := pg.Connection.Where("id = ?", id).Delete(&models.DailyNote{}).Error; err != nil {
+func (pg *PGService) DeleteDailyNoteByIdWithTx(tx *gorm.DB, id string) error {
+	if err := tx.Where("id = ?", id).Delete(&models.DailyNote{}).Error; err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (pg *PGService) BatchDeleteDailyNoteByIdWithTx(tx *gorm.DB, idArr []string) error {
+	for _, id := range idArr {
+		if err := pg.DeleteDailyNoteByIdWithTx(tx, id); err != nil {
+			return err
+		}
 	}
 
 	return nil

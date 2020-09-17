@@ -12,6 +12,7 @@ var (
 	DailyNoteIdNotFound         = errors.New("daily note id not found")
 	DailyNoteNotFound           = errors.New("daily note not found")
 	DailyNoteUpdateConfict      = errors.New("daily note update confict")
+	DailyNoteUpdateFailed       = errors.New("daily note update failed")
 	DailyQueryParametersInvaild = errors.New("daily note query parameters invaild")
 )
 

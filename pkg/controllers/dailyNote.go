@@ -8,6 +8,7 @@ import (
 	"ml_daily_record/pkg/services"
 	"ml_daily_record/pkg/util"
 	"net/http"
+	"strings"
 )
 
 type DailyNoteC struct {
@@ -41,64 +42,77 @@ func (dnC *DailyNoteC) GetDailyNotes(c *gin.Context) {
 	util.Response(c, err, dnList, int64(len(dnList)))
 }
 
-func (dnC *DailyNoteC) CreateDailyNote(c *gin.Context) {
-	dn := &models.DailyNote{}
-	if err := c.BindJSON(&dn); err != nil {
+func (dnC *DailyNoteC) CreateDailyNotes(c *gin.Context) {
+	dnList := make([]*models.DailyNote, 0)
+	if err := c.BindJSON(&dnList); err != nil {
 		log.Errorf(err.Error())
 		util.HttpResult(c, http.StatusBadRequest, models.DailyNoteParseFailed, nil)
 		return
 	}
-	if dn.Date == "" {
-		util.HttpResult(c, http.StatusBadRequest, models.DailyNoteParseFailed, nil)
-		return
+	for _, dn := range dnList {
+		if dn.Date == "" {
+			util.HttpResult(c, http.StatusBadRequest, models.DailyNoteParseFailed, nil)
+			return
+		}
+		if len(dn.Type) == 0 {
+			util.HttpResult(c, http.StatusBadRequest, models.DailyNoteParseFailed, nil)
+			return
+		}
+		if dn.Level == "" {
+			util.HttpResult(c, http.StatusBadRequest, models.DailyNoteParseFailed, nil)
+			return
+		}
 	}
-	if len(dn.Type) == 0 {
-		util.HttpResult(c, http.StatusBadRequest, models.DailyNoteParseFailed, nil)
-		return
-	}
-	if dn.Level == "" {
-		util.HttpResult(c, http.StatusBadRequest, models.DailyNoteParseFailed, nil)
-		return
-	}
-	err := services.CreateDailyNote(dn)
-	util.Response(c, err, dn, 0)
+
+	err := services.CreateDailyNotes(dnList)
+	util.Response(c, err, dnList, int64(len(dnList)))
 }
 
-func (dnC *DailyNoteC) UpdateDailyNote(c *gin.Context) {
+func (dnC *DailyNoteC) UpdateDailyNotes(c *gin.Context) {
 	id := c.Param("id")
 	if id == "" {
 		util.HttpResult(c, http.StatusBadRequest, models.DailyNoteIdNotFound, nil)
 		return
 	}
 
-	dnNew := &models.DailyNote{}
-	if err := c.BindJSON(&dnNew); err != nil {
+	dnNewList := make([]*models.DailyNote, 0)
+	if err := c.BindJSON(&dnNewList); err != nil {
 		log.Errorf(err.Error())
 		util.HttpResult(c, http.StatusBadRequest, models.DailyNoteParseFailed, nil)
 		return
 	}
-	if dnNew.Date == "" {
-		util.HttpResult(c, http.StatusBadRequest, models.DailyNoteParseFailed, nil)
-		return
+	for _, dnNew := range dnNewList {
+		if dnNew.Date == "" {
+			util.HttpResult(c, http.StatusBadRequest, models.DailyNoteParseFailed, nil)
+			return
+		}
+		if len(dnNew.Type) == 0 {
+			util.HttpResult(c, http.StatusBadRequest, models.DailyNoteParseFailed, nil)
+			return
+		}
+		if dnNew.Level == "" {
+			util.HttpResult(c, http.StatusBadRequest, models.DailyNoteParseFailed, nil)
+			return
+		}
 	}
-	if len(dnNew.Type) == 0 {
-		util.HttpResult(c, http.StatusBadRequest, models.DailyNoteParseFailed, nil)
-		return
-	}
-	if dnNew.Level == "" {
-		util.HttpResult(c, http.StatusBadRequest, models.DailyNoteParseFailed, nil)
-		return
-	}
-	err := services.UpdateDailyNote(dnNew)
-	util.Response(c, err, dnNew, 0)
+
+	err := services.UpdateDailyNotes(dnNewList)
+	util.Response(c, err, dnNewList, int64(len(dnNewList)))
 }
 
 func (dnC *DailyNoteC) DeleteDailyNote(c *gin.Context) {
-	id := c.Param("id")
-	if id == "" {
+	idStr := c.Param("id")
+	if idStr == "" {
 		util.HttpResult(c, http.StatusBadRequest, models.DailyNoteIdNotFound, nil)
 		return
 	}
-	err := services.DeleteDailyNoteById(id)
+
+	idArr := strings.Split(idStr, ",")
+	if len(idStr) == 0 {
+		util.HttpResult(c, http.StatusBadRequest, models.DailyNoteIdNotFound, nil)
+		return
+	}
+
+	err := services.DeleteDailyNoteByIds(idArr)
 	util.Response(c, err, nil, 0)
 }
