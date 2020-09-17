@@ -1,9 +1,9 @@
 {
   "swagger": "2.0",
   "info": {
-    "version": "1.4.0.11",
-    "title": "EnSaaS AppBuy API",
-    "description": "EnSaaS AppBuy API Document"
+    "version": "0.0.0.1",
+    "title": "Daily Note API",
+    "description": "Daily Note API Document"
   },
   "basePath": "/v1",
   "securityDefinitions": {
@@ -21,68 +21,26 @@
   ],
   "tags": [
     {
-      "name": "ChartRepos"
+      "name": "Auth"
     },
     {
-      "name": "Subscriptions"
-    },
-    {
-      "name": "HelmReleases"
-    },
-    {
-      "name": "ServiceInstances"
-    },
-    {
-      "name": "Token"
+      "name": "DailyNotes"
     }
   ],
   "paths": {
-    "/chartrepos": {
-      "get": {
-        "security": [
-          {
-            "EIToken": []
-          }
-        ],
-        "summary": "list all the catalog repos.",
-        "tags": [
-          "ChartRepos"
-        ],
-        "parameters": [
-          {
-            "name": "source",
-            "in": "query",
-            "description": "repo source string",
-            "type": "string",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "return the repo list",
-            "schema": {
-              "$ref": "#/definitions/ChartRepoResourceCollectionWithTotalCount"
-            }
-          }
-        }
-      },
+    "/auth/native": {
       "post": {
-        "security": [
-          {
-            "EIToken": []
-          }
-        ],
-        "summary": "create a chart repo",
+        "summary": "Get auth token",
         "tags": [
-          "ChartRepos"
+          "Auth"
         ],
         "parameters": [
           {
-            "name": "chartrepo",
+            "name": "authNative",
             "in": "body",
-            "description": "repo info",
+            "description": "auth info",
             "schema": {
-              "$ref": "#/definitions/ChartRepoCreate"
+              "$ref": "#/definitions/authNative"
             },
             "required": true
           }
@@ -91,1279 +49,147 @@
           "201": {
             "description": "return the created repo info",
             "schema": {
-              "$ref": "#/definitions/ChartRepoResourceCollection"
+              "$ref": "#/definitions/authResponse"
             }
           }
         }
       }
     },
-    "/chartrepos/{id}": {
+    "/dailyNotes": {
       "get": {
         "security": [
           {
             "EIToken": []
           }
         ],
-        "summary": "get a repo info by id.",
+        "summary": "Get daily notes by filters",
         "tags": [
-          "ChartRepos"
+          "DailyNotes"
         ],
         "parameters": [
           {
-            "name": "id",
-            "in": "path",
-            "description": "repo id",
-            "type": "integer",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "return the specific repo info",
-            "schema": {
-              "$ref": "#/definitions/ChartRepoResourceCollection"
-            }
-          }
-        }
-      },
-      "put": {
-        "security": [
-          {
-            "EIToken": []
-          }
-        ],
-        "summary": "update a repo by id.",
-        "tags": [
-          "ChartRepos"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "repo id",
-            "type": "integer",
-            "required": true
-          },
-          {
-            "name": "isOnlyUpdate",
+            "name": "from",
             "in": "query",
-            "description": "whether only update repo,default is true",
-            "type": "boolean",
-            "default": true,
-            "required": true
-          },
-          {
-            "name": "chartrepo",
-            "in": "body",
-            "description": "repo info",
-            "schema": {
-              "$ref": "#/definitions/ChartRepoUpdate"
-            },
-            "required": false
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "return the updated repo info",
-            "schema": {
-              "$ref": "#/definitions/ChartRepoResourceCollection"
-            }
-          }
-        }
-      },
-      "delete": {
-        "security": [
-          {
-            "EIToken": []
-          }
-        ],
-        "summary": "delete a repo by id.",
-        "tags": [
-          "ChartRepos"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "repo id",
-            "type": "integer",
-            "required": true
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "no content"
-          }
-        }
-      }
-    },
-    "/chartrepos/{id}/charts": {
-      "get": {
-        "security": [
-          {
-            "EIToken": []
-          }
-        ],
-        "summary": "list all charts of the specific repo",
-        "tags": [
-          "ChartRepos"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "repo id",
-            "type": "integer",
-            "required": true
-          },
-          {
-            "name": "chartname",
-            "in": "query",
-            "description": "For searching a specific chartname.",
+            "description": "The start time of the duration.Like '2020-2-12'",
             "type": "string",
-            "required": false,
-            "default": ""
-          },
-          {
-            "name": "pageSize",
-            "in": "query",
-            "description": "pageSize default is 20",
-            "type": "integer",
-            "required": false,
-            "default": 20
-          },
-          {
-            "name": "pageNum",
-            "in": "query",
-            "default": 1,
-            "type": "integer",
-            "description": "pageNum default is 1",
-            "required": false
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "list all charts of the specific repo",
-            "schema": {
-              "$ref": "#/definitions/ChartResourceCollectionWithTotalCount"
-            }
-          }
-        }
-      }
-    },
-    "/chartrepos/{id}/charts/{chartname}/versions": {
-      "get": {
-        "security": [
-          {
-            "EIToken": []
-          }
-        ],
-        "summary": "list all versions of the specific repo/chart",
-        "tags": [
-          "ChartRepos"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "repo id",
-            "type": "integer",
-            "required": true
-          },
-          {
-            "name": "chartname",
-            "in": "path",
-            "description": "chart name",
-            "type": "string",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "list all versions of the specific repo/chart",
-            "schema": {
-              "$ref": "#/definitions/VersionResourceCollectionWithTotalCount"
-            }
-          }
-        }
-      }
-    },
-    "/chartrepos/{id}/charts/{chartname}/versions/{version}/readme": {
-      "get": {
-        "security": [
-          {
-            "EIToken": []
-          }
-        ],
-        "summary": "Show readme of the specific repo/chart/version",
-        "tags": [
-          "ChartRepos"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "repo id",
-            "type": "integer",
-            "required": true
-          },
-          {
-            "name": "chartname",
-            "in": "path",
-            "description": "chart name",
-            "type": "string",
-            "required": true
-          },
-          {
-            "name": "version",
-            "in": "path",
-            "description": "version name",
-            "type": "string",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Show readme of the specific repo/chart/version",
-            "schema": {
-              "$ref": "#/definitions/ReadmeResourceCollection"
-            }
-          }
-        }
-      }
-    },
-    "/chartrepos/{id}/charts/{chartname}/versions/{version}/yaml": {
-      "get": {
-        "security": [
-          {
-            "EIToken": []
-          }
-        ],
-        "summary": "Show Chart.yaml of the specific repo/chart/version",
-        "tags": [
-          "ChartRepos"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "repo id",
-            "type": "integer",
-            "required": true
-          },
-          {
-            "name": "chartname",
-            "in": "path",
-            "description": "chart name",
-            "type": "string",
-            "required": true
-          },
-          {
-            "name": "version",
-            "in": "path",
-            "description": "version name",
-            "type": "string",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Show Chart.yaml of the specific repo/chart/version",
-            "schema": {
-              "$ref": "#/definitions/YamlResourceCollection"
-            }
-          }
-        }
-      }
-    },
-    "/chartrepos/{id}/charts/{chartname}/versions/{version}/values": {
-      "get": {
-        "security": [
-          {
-            "EIToken": []
-          }
-        ],
-        "summary": "Show Values.yaml of the specific repo/chart/version",
-        "tags": [
-          "ChartRepos"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "repo id",
-            "type": "integer",
-            "required": true
-          },
-          {
-            "name": "chartname",
-            "in": "path",
-            "description": "chart name",
-            "type": "string",
-            "required": true
-          },
-          {
-            "name": "version",
-            "in": "path",
-            "description": "version name",
-            "type": "string",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Show Values.yaml of the specific repo/chart/version",
-            "schema": {
-              "$ref": "#/definitions/ValuesResourceCollection"
-            }
-          }
-        }
-      }
-    },
-    "/chartrepos/{id}/charts/{chartname}/versions/{version}/dependencies": {
-      "get": {
-        "security": [
-          {
-            "EIToken": []
-          }
-        ],
-        "summary": "Show requirements.yaml of the specific repo/chart/version",
-        "tags": [
-          "ChartRepos"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "repo id",
-            "type": "integer",
-            "required": true
-          },
-          {
-            "name": "chartname",
-            "in": "path",
-            "description": "chart name",
-            "type": "string",
-            "required": true
-          },
-          {
-            "name": "version",
-            "in": "path",
-            "description": "version name",
-            "type": "string",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Show requirements.yaml of the specific repo/chart/version",
-            "schema": {
-              "$ref": "#/definitions/ValuesResourceCollection"
-            }
-          }
-        }
-      }
-    },
-    "/subscriptions": {
-      "get": {
-        "security": [
-          {
-            "EIToken": []
-          }
-        ],
-        "summary": "Get the specific namespace and source subscriptions",
-        "tags": [
-          "Subscriptions"
-        ],
-        "parameters": [
-          {
-            "name": "subscriptionId",
-            "in": "query",
-            "description": "subscriptionId",
-            "type": "string",
-            "required": true
-          },
-          {
-            "name": "datacenterCode",
-            "in": "query",
-            "description": "datacenterCode",
-            "type": "string",
-            "required": true
-          },
-          {
-            "name": "clusterName",
-            "in": "query",
-            "description": "cluster",
-            "type": "string",
-            "required": true
-          },
-          {
-            "name": "workspaceId",
-            "in": "query",
-            "description": "workspaceId",
-            "type": "string",
-            "required": true
-          },
-          {
-            "name": "namespaceName",
-            "in": "query",
-            "description": "namespaceName",
-            "type": "string",
-            "required": true
-          },
-          {
-            "name": "source",
-            "in": "query",
-            "description": "A filter by source ,only support private, public and marketplace",
             "default": "",
+            "required": false
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "description": "The end time of the duration.Like '2020-3-12'",
             "type": "string",
-            "required": true
+            "default": "",
+            "required": false
           },
           {
-            "name": "pageSize",
+            "name": "type",
             "in": "query",
-            "description": "pageSize default is 20",
-            "type": "integer",
-            "required": false,
-            "default": 20
-          },
+            "description": "The type of the daily note. Only 'period','holiday','anniversary','birthday' and 'manual' are support ",
+            "type": "string",
+            "default": "",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "return the daily note list",
+            "schema": {
+              "$ref": "#/definitions/dailyNotesResponse"
+            }
+          }
+        }
+      },
+      "post": {
+        "security": [
           {
-            "name": "pageNum",
-            "in": "query",
-            "default": 1,
-            "type": "integer",
-            "description": "pageNum default is 1",
+            "EIToken": []
+          }
+        ],
+        "summary": "Create daily notes",
+        "tags": [
+          "DailyNotes"
+        ],
+        "parameters": [
+          {
+            "name": "dailyNotes",
+            "in": "body",
+            "description": "The list of daily notes",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/dailyNotesCreate"
+              }
+            },
             "required": false
           }
         ],
         "responses": {
           "201": {
-            "description": "return the specific namespace's subscriptions",
+            "description": "return the created daily notes",
             "schema": {
-              "$ref": "#/definitions/SubscriptionResourceCollectionWithTotalCount"
+              "$ref": "#/definitions/dailyNotesResponse"
             }
           }
         }
       },
-      "post": {
+      "put": {
         "security": [
           {
             "EIToken": []
           }
         ],
-        "summary": "create a subscription of the chart,only support private and public repo",
+        "summary": "Update the list of daily notes",
         "tags": [
-          "Subscriptions"
+          "DailyNotes"
         ],
         "parameters": [
           {
-            "name": "subscription",
+            "name": "dailyNotes",
             "in": "body",
-            "description": "subscription info",
+            "description": "The list of dailyNotes",
             "schema": {
-              "$ref": "#/definitions/SubscriptionCreate"
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/dailyNotesUpdate"
+              }
             },
-            "required": true
+            "required": false
           }
         ],
         "responses": {
           "201": {
-            "description": "return the created subscription info",
+            "description": "return the updated dailyNotes",
             "schema": {
-              "$ref": "#/definitions/SubscriptionResourceCollection"
+              "$ref": "#/definitions/dailyNotesResponse"
             }
           }
         }
       }
     },
-    "/subscriptions/{sid}": {
-      "get": {
-        "security": [
-          {
-            "EIToken": []
-          }
-        ],
-        "summary": "Get the specific subscription info",
-        "tags": [
-          "Subscriptions"
-        ],
-        "parameters": [
-          {
-            "name": "sid",
-            "in": "path",
-            "description": "subscription id",
-            "type": "string",
-            "required": true
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "return the specific subscription info",
-            "schema": {
-              "$ref": "#/definitions/SubscriptionResourceCollection"
-            }
-          }
-        }
-      },
+    "/dailyNotes/{id}": {
       "delete": {
         "security": [
           {
             "EIToken": []
           }
         ],
-        "summary": "delete the subscriptions by id,only support private and public repo",
+        "summary": "Delete daily note by id array.",
         "tags": [
-          "Subscriptions"
+          "DailyNotes"
         ],
         "parameters": [
           {
-            "name": "sid",
+            "name": "id",
             "in": "path",
-            "description": "subscription id",
+            "description": "daily note id array, join with comma.Like xxx,xxxx,xxxx",
             "type": "string",
             "required": true
           }
         ],
         "responses": {
           "204": {
-            "description": "no content"
-          }
-        }
-      },
-      "put": {
-        "security": [
-          {
-            "EIToken": []
-          }
-        ],
-        "summary": "update a subscription of the chart,only support private and public repo",
-        "tags": [
-          "Subscriptions"
-        ],
-        "parameters": [
-          {
-            "name": "sid",
-            "in": "path",
-            "description": "subscription id",
-            "type": "string",
-            "required": true
-          },
-          {
-            "name": "subscription",
-            "in": "body",
-            "description": "subscription info",
-            "schema": {
-              "$ref": "#/definitions/SubscriptionUpdate"
-            },
-            "required": true
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "return the updated subscription info",
-            "schema": {
-              "$ref": "#/definitions/SubscriptionResourceCollection"
-            }
-          }
-        }
-      }
-    },
-    "/subscriptions/{sid}/status": {
-      "get": {
-        "security": [
-          {
-            "EIToken": []
-          }
-        ],
-        "summary": "Get the deploy status of the specific subscription",
-        "tags": [
-          "Subscriptions"
-        ],
-        "parameters": [
-          {
-            "name": "sid",
-            "in": "path",
-            "description": "subscription id",
-            "type": "string",
-            "required": true
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "return the deploy resources status of the subscription",
-            "schema": {
-              "$ref": "#/definitions/StatusResourceCollection"
-            }
-          }
-        }
-      }
-    },
-    "/subscriptions/{sid}/limit": {
-      "patch": {
-        "security": [
-          {
-            "EIToken": []
-          }
-        ],
-        "summary": "Limit the subscription's deployment replicaCount to 0.",
-        "tags": [
-          "Subscriptions"
-        ],
-        "parameters": [
-          {
-            "name": "sid",
-            "in": "path",
-            "description": "subscription id",
-            "type": "string",
-            "required": true
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "return the process result of limiting the subscription",
-            "schema": {
-              "$ref": "#/definitions/LimitResourceCollection"
-            }
-          }
-        }
-      }
-    },
-    "/subscriptions/{sid}/resume": {
-      "patch": {
-        "security": [
-          {
-            "EIToken": []
-          }
-        ],
-        "summary": "Resume the subscription's deployment.",
-        "tags": [
-          "Subscriptions"
-        ],
-        "parameters": [
-          {
-            "name": "sid",
-            "in": "path",
-            "description": "subscription id",
-            "type": "string",
-            "required": true
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "return the result of resuming the subscription",
-            "schema": {
-              "$ref": "#/definitions/ResumeResourceCollection"
-            }
-          }
-        }
-      }
-    },
-    "/subscriptions/{sids}/upgrade": {
-      "get": {
-        "security": [
-          {
-            "EIToken": []
-          }
-        ],
-        "summary": "Check the subscriptions whether can be updated.",
-        "tags": [
-          "Subscriptions"
-        ],
-        "parameters": [
-          {
-            "name": "sids",
-            "in": "path",
-            "description": "subscription id list array string ,like 1,2,3,4,5",
-            "type": "string",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "return the subscriptions whether can be updated info",
-            "schema": {
-              "$ref": "#/definitions/CanBeUpdatedResourceCollectionWithTotalCount"
-            }
-          }
-        }
-      }
-    },
-    "/helmReleases": {
-      "get": {
-        "summary": "get helm release list by filter",
-        "security": [
-          {
-            "EIToken": []
-          }
-        ],
-        "tags": [
-          "HelmReleases"
-        ],
-        "parameters": [
-          {
-            "name": "subscriptionId",
-            "in": "query",
-            "description": "subscriptionId",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "datacenterCode",
-            "in": "query",
-            "description": "datacenterCode",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "clusterName",
-            "in": "query",
-            "description": "clusterName",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "workspaceId",
-            "in": "query",
-            "description": "workspaceId",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "namespaceName",
-            "in": "query",
-            "description": "namespaceName",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "offset",
-            "in": "query",
-            "description": "next release name in the list, used to offset from start value",
-            "required": false,
-            "default": "",
-            "type": "integer"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Return helm release list",
-            "schema": {
-              "$ref": "#/definitions/HelmReleaseResourceCollection"
-            }
-          }
-        }
-      }
-    },
-    "/helmReleases/{releaseName}/status": {
-      "get": {
-        "summary": "get helm release status",
-        "security": [
-          {
-            "EIToken": []
-          }
-        ],
-        "tags": [
-          "HelmReleases"
-        ],
-        "parameters": [
-          {
-            "name": "releaseName",
-            "in": "path",
-            "description": "release name",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "subscriptionId",
-            "in": "query",
-            "description": "subscriptionId",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "datacenterCode",
-            "in": "query",
-            "description": "datacenterCode",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "clusterName",
-            "in": "query",
-            "description": "clusterName",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "workspaceId",
-            "in": "query",
-            "description": "workspaceId",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "namespaceName",
-            "in": "query",
-            "description": "namespaceName",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Return helm release status",
-            "schema": {
-              "$ref": "#/definitions/StatusResourceCollection"
-            }
-          }
-        }
-      }
-    },
-    "/serviceInstances": {
-      "get": {
-        "security": [
-          {
-            "EIToken": []
-          }
-        ],
-        "summary": "Get the app service instances list",
-        "tags": [
-          "ServiceInstances"
-        ],
-        "parameters": [
-          {
-            "name": "subscriptionId",
-            "in": "query",
-            "description": "subscriptionId",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "datacenterCode",
-            "in": "query",
-            "description": "The specific datacenterCode of app service instance.",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "clusterName",
-            "in": "query",
-            "description": "The specific clusterName of app service instance.",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "workspaceId",
-            "in": "query",
-            "description": "The specific workspaceId of app service instance.",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "namespaceName",
-            "in": "query",
-            "description": "The specific namespaceName of app service instance.",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "serviceName",
-            "in": "query",
-            "description": "The specific serviceName of app service instance.",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "onlyActived",
-            "in": "query",
-            "description": "Whether get actived service instance only,default get actived and inactived service instance",
-            "required": false,
-            "default": false,
-            "type": "boolean"
-          },
-          {
-            "name": "pageSize",
-            "in": "query",
-            "description": "page size",
-            "required": false,
-            "type": "string",
-            "default": "20"
-          },
-          {
-            "name": "pageNum",
-            "in": "query",
-            "description": "page number",
-            "required": false,
-            "type": "string",
-            "default": "1"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "return the app service instances list",
-            "schema": {
-              "$ref": "#/definitions/AppServiceInstanceResourceCollectionWithTotalCount"
-            }
-          }
-        }
-      },
-      "post": {
-        "security": [
-          {
-            "EIToken": []
-          }
-        ],
-        "summary": "create service instance from service Instance Config",
-        "tags": [
-          "ServiceInstances"
-        ],
-        "parameters": [
-          {
-            "name": "serviceInstanceConfig",
-            "in": "body",
-            "description": "app service instance config info",
-            "schema": {
-              "$ref": "#/definitions/ServiceInstanceConfig"
-            },
-            "required": true
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "return the app service instance info",
-            "schema": {
-              "$ref": "#/definitions/AppServiceInstanceResourceCollectionWithoutTotalCount"
-            }
-          }
-        }
-      },
-      "put": {
-        "security": [
-          {
-            "EIToken": []
-          }
-        ],
-        "summary": "upgrade or downgrade service instances",
-        "tags": [
-          "ServiceInstances"
-        ],
-        "parameters": [
-          {
-            "name": "serviceInstanceConfig",
-            "in": "body",
-            "description": "app service instance config info",
-            "schema": {
-              "$ref": "#/definitions/ServiceInstanceConfig"
-            },
-            "required": true
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "upgrade/downgrade ok"
-          }
-        }
-      }
-    },
-    "/serviceInstances/redeploy": {
-      "post": {
-        "security": [
-          {
-            "EIToken": []
-          }
-        ],
-        "summary": "redeploy serviceInstanceConfig",
-        "tags": [
-          "ServiceInstances"
-        ],
-        "parameters": [
-          {
-            "name": "serviceInstanceConfig",
-            "in": "body",
-            "description": "app service instance config info",
-            "schema": {
-              "$ref": "#/definitions/ServiceInstanceConfig"
-            },
-            "required": true
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "return the app service instance info",
-            "schema": {
-              "$ref": "#/definitions/AppServiceInstanceResourceCollectionWithoutTotalCount"
-            }
-          }
-        }
-      }
-    },
-    "/serviceInstances/{id}": {
-      "get": {
-        "security": [
-          {
-            "EIToken": []
-          }
-        ],
-        "summary": "Get the specific app service instance",
-        "tags": [
-          "ServiceInstances"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "The specific id of app service instance.",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "return the specific app service instance by id",
-            "schema": {
-              "$ref": "#/definitions/AppServiceInstanceResourceCollectionWithoutTotalCount"
-            }
-          }
-        }
-      },
-      "delete": {
-        "security": [
-          {
-            "EIToken": []
-          }
-        ],
-        "summary": "total delete an app service instance",
-        "tags": [
-          "ServiceInstances"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "The specific app service instance id.",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "no content"
-          }
-        }
-      }
-    },
-    "/serviceInstances/{id}/cancel": {
-      "delete": {
-        "security": [
-          {
-            "EIToken": []
-          }
-        ],
-        "summary": "unsubscribe an app service instance",
-        "tags": [
-          "ServiceInstances"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "The specific app service instance id.",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "patch ok"
-          }
-        }
-      }
-    },
-    "/serviceInstances/{id}/resume": {
-      "put": {
-        "security": [
-          {
-            "EIToken": []
-          }
-        ],
-        "summary": "resume an app service instance",
-        "tags": [
-          "ServiceInstances"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "The specific app service instance id.",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "patch ok"
-          }
-        }
-      }
-    },
-    "/serviceInstances/{id}/update": {
-      "put": {
-        "security": [
-          {
-            "EIToken": []
-          }
-        ],
-        "summary": "update the app version of an app service instance",
-        "tags": [
-          "ServiceInstances"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "The specific app service instance id.",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "app version update ok"
-          }
-        }
-      }
-    },
-	"/serviceInstances/{id}/redeploy": {
-	  "put": {
-		  "security": [
-			  {
-				  "EIToken": []
-			  }
-		  ],
-		  "summary": "redeploy an exist service instance by id",
-		  "tags": [
-			  "ServiceInstances"
-		  ],
-		  "parameters": [
-			  {
-				  "name": "id",
-				  "in": "path",
-				  "description": "id",
-				  "type": "string",
-				  "required": true
-			  }
-		  ],
-		  "responses": {
-			  "201": {
-				  "description": "operation success"
-			  }
-		  }
-	  }
-	},
-    "/serviceInstances/{id}/canUpdates": {
-      "get": {
-        "security": [
-          {
-            "EIToken": []
-          }
-        ],
-        "summary": "get app service instances whether can update",
-        "tags": [
-          "ServiceInstances"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "App service instance id connect by comma, like xxx,xxx,xxx",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "return service instances can update",
-            "schema": {
-              "$ref": "#/definitions/ServiceInstanceCanUpdateResourceCollectionWithTotalCount"
-            }
-          }
-        }
-      }
-    },
-    "/serviceInstances/{id}/logs": {
-      "get": {
-        "security": [
-          {
-            "EIToken": []
-          }
-        ],
-        "summary": "get a specific app service instance log info",
-        "tags": [
-          "ServiceInstances"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "The specific app service instance id.",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "return the app service instance log info",
-            "schema": {
-              "$ref": "#/definitions/AppServiceInstanceLogResourceCollectionWithTotalCount"
-            }
-          }
-        }
-      }
-    },
-    "/serviceInstances/{id}/instances": {
-      "get": {
-        "security": [
-          {
-            "EIToken": []
-          }
-        ],
-        "summary": "Get a specific app service instance deployed instances list",
-        "tags": [
-          "ServiceInstances"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "The specific app service instance id.",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "Return deployed instances list of the specific app service instance",
-            "schema": {
-              "$ref": "#/definitions/SubscriptionResourceCollectionWithTotalCount"
-            }
-          }
-        }
-      }
-    },
-    "/token/refreshToken": {
-      "post": {
-        "security": [
-          {
-            "EIToken": []
-          }
-        ],
-        "tags": [
-          "Token"
-        ],
-        "summary": "Refresh appbuy client token, global admin use only.",
-        "parameters": [],
-        "responses": {
-          "201": {
             "description": "no content"
           }
         }
@@ -1371,547 +197,7 @@
     }
   },
   "definitions": {
-    "ChartRepoResourceCollection": {
-      "type": "object",
-      "properties": {
-        "status": {
-          "type": "integer"
-        },
-        "data": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ChartRepo"
-          }
-        },
-        "error": {
-          "type": "string"
-        },
-        "path": {
-          "type": "string"
-        },
-        "timestamp": {
-          "type": "string"
-        }
-      }
-    },
-    "ChartRepoResourceCollectionWithTotalCount": {
-      "type": "object",
-      "properties": {
-        "status": {
-          "type": "integer"
-        },
-        "data": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ChartRepo"
-          }
-        },
-        "error": {
-          "type": "string"
-        },
-        "path": {
-          "type": "string"
-        },
-        "timestamp": {
-          "type": "string"
-        },
-        "totalCount": {
-          "type": "integer"
-        }
-      }
-    },
-    "SubscriptionResourceCollection": {
-      "type": "object",
-      "properties": {
-        "status": {
-          "type": "integer"
-        },
-        "data": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Subscription"
-          }
-        },
-        "error": {
-          "type": "string"
-        },
-        "path": {
-          "type": "string"
-        },
-        "timestamp": {
-          "type": "string"
-        }
-      }
-    },
-    "SubscriptionResourceCollectionWithTotalCount": {
-      "type": "object",
-      "properties": {
-        "status": {
-          "type": "integer"
-        },
-        "data": {
-          "type": "array",
-          "items": {
-            "properties": {
-              "total": {
-                "type": "integer"
-              },
-              "releases": {
-                "items": {
-                  "$ref": "#/definitions/Subscription"
-                }
-              },
-              "next": {
-                "type": "string"
-              },
-              "pageSize": {
-                "type": "integer"
-              },
-              "pageNum": {
-                "type": "integer"
-              }
-            }
-          }
-        },
-        "error": {
-          "type": "string"
-        },
-        "path": {
-          "type": "string"
-        },
-        "timestamp": {
-          "type": "string"
-        },
-        "totalCount": {
-          "type": "integer"
-        }
-      }
-    },
-    "ChartResourceCollectionWithTotalCount": {
-      "type": "object",
-      "properties": {
-        "status": {
-          "type": "integer"
-        },
-        "data": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Chart"
-          }
-        },
-        "error": {
-          "type": "string"
-        },
-        "path": {
-          "type": "string"
-        },
-        "timestamp": {
-          "type": "string"
-        },
-        "totalCount": {
-          "type": "integer"
-        }
-      }
-    },
-    "ChartRepoIconsResourceCollectionWithTotalCount": {
-      "type": "object",
-      "properties": {
-        "status": {
-          "type": "integer"
-        },
-        "data": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Icons"
-          }
-        },
-        "error": {
-          "type": "string"
-        },
-        "path": {
-          "type": "string"
-        },
-        "timestamp": {
-          "type": "string"
-        },
-        "totalCount": {
-          "type": "integer"
-        }
-      }
-    },
-    "VersionResourceCollectionWithTotalCount": {
-      "type": "object",
-      "properties": {
-        "status": {
-          "type": "integer"
-        },
-        "data": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Version"
-          }
-        },
-        "error": {
-          "type": "string"
-        },
-        "path": {
-          "type": "string"
-        },
-        "timestamp": {
-          "type": "string"
-        },
-        "totalCount": {
-          "type": "integer"
-        }
-      }
-    },
-    "ReadmeResourceCollection": {
-      "type": "object",
-      "properties": {
-        "status": {
-          "type": "integer"
-        },
-        "data": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Readme"
-          }
-        },
-        "error": {
-          "type": "string"
-        },
-        "path": {
-          "type": "string"
-        },
-        "timestamp": {
-          "type": "string"
-        }
-      }
-    },
-    "YamlResourceCollection": {
-      "type": "object",
-      "properties": {
-        "status": {
-          "type": "integer"
-        },
-        "data": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Yaml"
-          }
-        },
-        "error": {
-          "type": "string"
-        },
-        "path": {
-          "type": "string"
-        },
-        "timestamp": {
-          "type": "string"
-        }
-      }
-    },
-    "ValuesResourceCollection": {
-      "type": "object",
-      "properties": {
-        "status": {
-          "type": "integer"
-        },
-        "data": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Values"
-          }
-        },
-        "error": {
-          "type": "string"
-        },
-        "path": {
-          "type": "string"
-        },
-        "timestamp": {
-          "type": "string"
-        }
-      }
-    },
-    "DependencyResourceCollection": {
-      "type": "object",
-      "properties": {
-        "status": {
-          "type": "integer"
-        },
-        "data": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Dependency"
-          }
-        },
-        "error": {
-          "type": "string"
-        },
-        "path": {
-          "type": "string"
-        },
-        "timestamp": {
-          "type": "string"
-        }
-      }
-    },
-    "HelmReleaseResourceCollection": {
-      "type": "object",
-      "properties": {
-        "status": {
-          "type": "integer"
-        },
-        "data": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ReleaseElement"
-          }
-        },
-        "error": {
-          "type": "string"
-        },
-        "path": {
-          "type": "string"
-        },
-        "timestamp": {
-          "type": "string"
-        }
-      }
-    },
-    "StatusResourceCollection": {
-      "type": "object",
-      "properties": {
-        "status": {
-          "type": "integer"
-        },
-        "data": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Status"
-          }
-        },
-        "error": {
-          "type": "string"
-        },
-        "path": {
-          "type": "string"
-        },
-        "timestamp": {
-          "type": "string"
-        }
-      }
-    },
-    "LimitResourceCollection": {
-      "type": "object",
-      "properties": {
-        "status": {
-          "type": "integer"
-        },
-        "data": {
-          "type": "string"
-        },
-        "error": {
-          "type": "string"
-        },
-        "path": {
-          "type": "string"
-        },
-        "timestamp": {
-          "type": "string"
-        }
-      }
-    },
-    "ResumeResourceCollection": {
-      "type": "object",
-      "properties": {
-        "status": {
-          "type": "integer"
-        },
-        "data": {
-          "type": "string"
-        },
-        "error": {
-          "type": "string"
-        },
-        "path": {
-          "type": "string"
-        },
-        "timestamp": {
-          "type": "string"
-        }
-      }
-    },
-    "CanBeUpdatedResourceCollectionWithTotalCount": {
-      "type": "object",
-      "properties": {
-        "status": {
-          "type": "integer"
-        },
-        "data": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/SubscriptionCanBeUpdate"
-          }
-        },
-        "error": {
-          "type": "string"
-        },
-        "path": {
-          "type": "string"
-        },
-        "timestamp": {
-          "type": "string"
-        },
-        "totalCount": {
-          "type": "integer"
-        }
-      }
-    },
-    "AppServiceInstanceResourceCollectionWithTotalCount": {
-      "type": "object",
-      "properties": {
-        "status": {
-          "type": "integer"
-        },
-        "data": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/AppServiceInstance"
-          }
-        },
-        "error": {
-          "type": "string"
-        },
-        "path": {
-          "type": "string"
-        },
-        "timestamp": {
-          "type": "string"
-        },
-        "totalCount": {
-          "type": "integer"
-        }
-      }
-    },
-    "AppServiceInstanceResourceCollectionWithoutTotalCount": {
-      "type": "object",
-      "properties": {
-        "status": {
-          "type": "integer"
-        },
-        "data": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/AppServiceInstance"
-          }
-        },
-        "error": {
-          "type": "string"
-        },
-        "path": {
-          "type": "string"
-        },
-        "timestamp": {
-          "type": "string"
-        }
-      }
-    },
-    "AppServiceInstanceLogResourceCollectionWithTotalCount": {
-      "type": "object",
-      "properties": {
-        "status": {
-          "type": "integer"
-        },
-        "data": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/AppServiceInstanceLog"
-          }
-        },
-        "error": {
-          "type": "string"
-        },
-        "path": {
-          "type": "string"
-        },
-        "timestamp": {
-          "type": "string"
-        },
-        "totalCount": {
-          "type": "integer"
-        }
-      }
-    },
-    "ServiceInstanceCanUpdateResourceCollectionWithTotalCount": {
-      "type": "object",
-      "properties": {
-        "status": {
-          "type": "integer"
-        },
-        "data": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ServiceInstanceCanUpdate"
-          }
-        },
-        "error": {
-          "type": "string"
-        },
-        "path": {
-          "type": "string"
-        },
-        "timestamp": {
-          "type": "string"
-        },
-        "totalCount": {
-          "type": "integer"
-        }
-      }
-    },
-    "ChartRepo": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "integer"
-        },
-        "username": {
-          "type": "string"
-        },
-        "password": {
-          "type": "string"
-        },
-        "url": {
-          "type": "string"
-        },
-        "userId": {
-          "type": "string"
-        },
-        "status": {
-          "type": "string"
-        },
-        "message": {
-          "type": "string"
-        },
-        "info": {
-          "type": "object"
-        },
-        "repoName": {
-          "type": "string"
-        },
-        "datacenterCode": {
-          "type": "string"
-        },
-        "createAt": {
-          "type": "string"
-        },
-        "updateAt": {
-          "type": "string"
-        }
-      }
-    },
-    "ChartRepoCreate": {
+    "authNative": {
       "type": "object",
       "properties": {
         "username": {
@@ -1919,1226 +205,163 @@
         },
         "password": {
           "type": "string"
-        },
-        "url": {
-          "type": "string"
-        },
-        "repoName": {
-          "type": "string"
-        },
-        "source": {
-          "type": "string"
-        },
-        "datacenterCode": {
-          "type": "string"
         }
       }
     },
-    "ChartRepoUpdate": {
+    "authResponse": {
       "type": "object",
       "properties": {
-        "username": {
-          "type": "string"
-        },
-        "password": {
-          "type": "string"
-        },
-        "url": {
-          "type": "string"
-        }
-      }
-    },
-    "Subscription": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "integer"
-        },
-        "userId": {
-          "type": "integer"
-        },
-        "name": {
-          "type": "string"
-        },
-        "datacenterCode": {
-          "type": "string"
-        },
-        "clusterName": {
-          "type": "string"
-        },
-        "subscriptionId": {
-          "type": "string"
-        },
-        "workspaceId": {
-          "type": "string"
-        },
-        "workspaceName": {
-          "type": "string"
-        },
-        "namespaceName": {
-          "type": "string"
-        },
-        "chartRepoId": {
-          "type": "integer"
-        },
-        "chartName": {
-          "type": "string"
-        },
-        "versionName": {
-          "type": "string"
-        },
-        "yamlFile": {
-          "type": "string"
-        },
-        "extraArgs": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ExtraArgs"
-          }
-        },
-        "status": {
-          "type": "string"
-        },
-        "message": {
-          "type": "string"
-        },
-        "source": {
-          "type": "string"
-        },
-        "icon": {
-          "type": "string"
-        },
-        "description": {
-          "type": "string"
-        },
-        "isWait": {
-          "type": "string"
-        },
-        "isLimited": {
-          "type": "integer"
-        },
-        "externalPortalUrl": {
-          "type": "string"
-        },
-        "internalPortalUrl": {
-          "type": "string"
-        },
-        "appServiceInstanceId": {
-          "type": "string"
-        },
-        "dockerUsername": {
-          "type": "string"
-        },
-        "dockerPassword": {
-          "type": "string"
-        },
-        "dockerServerUrl": {
-          "type": "string"
-        },
-        "createdAt": {
-          "type": "string"
-        },
-        "updatedAt": {
-          "type": "string"
-        }
-      }
-    },
-    "SubscriptionCreate": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "datacenterCode": {
-          "type": "string"
-        },
-        "clusterName": {
-          "type": "string"
-        },
-        "subscriptionId": {
-          "type": "string"
-        },
-        "workspaceId": {
-          "type": "string"
-        },
-        "workspaceName": {
-          "type": "string"
-        },
-        "namespaceName": {
-          "type": "string"
-        },
-        "chartRepoId": {
-          "type": "integer"
-        },
-        "chartName": {
-          "type": "string"
-        },
-        "versionName": {
-          "type": "string"
-        },
-        "yamlFile": {
-          "type": "string"
-        },
-        "extraArgs": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ExtraArgs"
-          }
-        },
-        "isWait": {
-          "type": "string"
-        },
-        "dockerUsername": {
-          "type": "string"
-        },
-        "dockerPassword": {
-          "type": "string"
-        },
-        "dockerServerUrl": {
-          "type": "string"
-        }
-      }
-    },
-    "SubscriptionUpdate": {
-      "type": "object",
-      "properties": {
-        "chartName": {
-          "type": "string"
-        },
-        "versionName": {
-          "type": "string"
-        },
-        "yamlFile": {
-          "type": "string"
-        },
-        "extraArgs": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ExtraArgs"
-          }
-        },
-        "isWait": {
-          "type": "string"
-        },
-        "dockerUsername": {
-          "type": "string"
-        },
-        "dockerPassword": {
-          "type": "string"
-        },
-        "dockerServerUrl": {
-          "type": "string"
-        }
-      }
-    },
-    "SubscriptionCanBeUpdate": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "integer"
-        },
-        "lastChartVersion": {
-          "type": "string"
-        },
-        "currentChartVersion": {
+        "data": {
           "type": "string"
         },
         "error": {
           "type": "string"
         },
-        "canUpdate": {
-          "type": "boolean"
-        }
-      }
-    },
-    "Chart": {
-      "type": "object",
-      "properties": {
-        "appversion": {
-          "type": "string"
-        },
-        "chartversion": {
-          "type": "string"
-        },
-        "description": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        },
-        "icon": {
-          "type": "string"
-        }
-      }
-    },
-    "Version": {
-      "type": "object",
-      "properties": {
-        "appversion": {
-          "type": "string"
-        },
-        "chartversion": {
-          "type": "string"
-        },
-        "description": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        }
-      }
-    },
-    "Readme": {
-      "type": "object",
-      "properties": {
-        "readme": {
-          "type": "string"
-        }
-      }
-    },
-    "Yaml": {
-      "type": "object",
-      "properties": {
-        "apiVersion": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        },
-        "version": {
-          "type": "string"
-        },
-        "kubeVersion": {
-          "type": "string"
-        },
-        "description": {
-          "type": "string"
-        },
-        "keywords": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "home": {
-          "type": "string"
-        },
-        "sources": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "maintainers": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "name": {
-                "type": "string"
-              },
-              "email": {
-                "type": "string"
-              },
-              "url": {
-                "type": "string"
-              }
-            }
-          }
-        },
-        "engine": {
-          "type": "string"
-        },
-        "icon": {
-          "type": "string"
-        },
-        "appVersion": {
-          "type": "string"
-        },
-        "deprecated": {
-          "type": "boolean"
-        },
-        "tillerVersion": {
-          "type": "string"
-        }
-      }
-    },
-    "Values": {
-      "type": "object",
-      "properties": {
-        "values": {
-          "type": "string"
-        }
-      }
-    },
-    "Dependency": {
-      "type": "object",
-      "properties": {
-        "dependencies": {
-          "type": "array",
-          "items": [
-            {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "string"
-                },
-                "version": {
-                  "type": "string"
-                },
-                "repository": {
-                  "type": "string"
-                }
-              }
-            }
-          ]
-        }
-      }
-    },
-    "ExtraArgs": {
-      "type": "string"
-    },
-    "Status": {
-      "type": "object",
-      "properties": {
-        "answer": {
+        "path": {
           "type": "string"
         },
         "status": {
-          "type": "string"
+          "type": "number"
         },
-        "lastDeployTime": {
-          "type": "string"
-        },
-        "namespace": {
-          "type": "string"
-        },
-        "resources": {
-          "type": "object",
-          "properties": {
-            "deployment": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "age": {
-                    "type": "string"
-                  },
-                  "available": {
-                    "type": "string"
-                  },
-                  "name": {
-                    "type": "string"
-                  },
-                  "ready": {
-                    "type": "string"
-                  },
-                  "up-to-date": {
-                    "type": "string"
-                  },
-                  "imageName": {
-                    "type": "string"
-                  },
-                  "ingressName": {
-                    "type": "string"
-                  },
-                  "cpu": {
-                    "type": "object",
-                    "properties": {
-                      "limit": {
-                        "type": "string"
-                      },
-                      "request": {
-                        "type": "string"
-                      }
-                    }
-                  },
-                  "memory": {
-                    "type": "object",
-                    "properties": {
-                      "limit": {
-                        "type": "string"
-                      },
-                      "request": {
-                        "type": "string"
-                      }
-                    }
-                  },
-                  "ephemeralStorage": {
-                    "type": "object",
-                    "properties": {
-                      "limit": {
-                        "type": "string"
-                      },
-                      "request": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                }
-              }
-            },
-            "statefulSet": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "age": {
-                    "type": "string"
-                  },
-                  "name": {
-                    "type": "string"
-                  },
-                  "ready": {
-                    "type": "string"
-                  },
-                  "imageName": {
-                    "type": "string"
-                  },
-                  "ingressName": {
-                    "type": "string"
-                  },
-                  "cpu": {
-                    "type": "object",
-                    "properties": {
-                      "limit": {
-                        "type": "string"
-                      },
-                      "request": {
-                        "type": "string"
-                      }
-                    }
-                  },
-                  "memory": {
-                    "type": "object",
-                    "properties": {
-                      "limit": {
-                        "type": "string"
-                      },
-                      "request": {
-                        "type": "string"
-                      }
-                    }
-                  },
-                  "ephemeralStorage": {
-                    "type": "object",
-                    "properties": {
-                      "limit": {
-                        "type": "string"
-                      },
-                      "request": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                }
-              }
-            },
-            "daemonSet": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "age": {
-                    "type": "string"
-                  },
-                  "name": {
-                    "type": "string"
-                  },
-                  "desired": {
-                    "type": "string"
-                  },
-                  "current": {
-                    "type": "string"
-                  },
-                  "ready": {
-                    "type": "string"
-                  },
-                  "up-to-date": {
-                    "type": "string"
-                  },
-                  "avaliable": {
-                    "type": "string"
-                  },
-                  "imageName": {
-                    "type": "string"
-                  },
-                  "ingressName": {
-                    "type": "string"
-                  },
-                  "cpu": {
-                    "type": "object",
-                    "properties": {
-                      "limit": {
-                        "type": "string"
-                      },
-                      "request": {
-                        "type": "string"
-                      }
-                    }
-                  },
-                  "memory": {
-                    "type": "object",
-                    "properties": {
-                      "limit": {
-                        "type": "string"
-                      },
-                      "request": {
-                        "type": "string"
-                      }
-                    }
-                  },
-                  "ephemeralStorage": {
-                    "type": "object",
-                    "properties": {
-                      "limit": {
-                        "type": "string"
-                      },
-                      "request": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                }
-              }
-            },
-            "service": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "age": {
-                    "type": "string"
-                  },
-                  "cluster-ip": {
-                    "type": "string"
-                  },
-                  "external-ip": {
-                    "type": "string"
-                  },
-                  "name": {
-                    "type": "string"
-                  },
-                  "port(s)": {
-                    "type": "string"
-                  },
-                  "type": {
-                    "type": "string"
-                  }
-                }
-              }
-            },
-            "ingress": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "address": {
-                    "type": "string"
-                  },
-                  "age": {
-                    "type": "string"
-                  },
-                  "hosts": {
-                    "type": "string"
-                  },
-                  "name": {
-                    "type": "string"
-                  },
-                  "ports": {
-                    "type": "string"
-                  }
-                }
-              }
-            },
-            "secret": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "age": {
-                    "type": "string"
-                  },
-                  "data": {
-                    "type": "string"
-                  },
-                  "name": {
-                    "type": "string"
-                  },
-                  "type": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "notes": {
-          "type": "string"
+        "timestamp:": {
+          "type": "number"
         }
       }
     },
-    "Icons": {
-      "type": "object",
-      "properties": {
-        "instanceId": {
-          "type": "integer"
-        },
-        "icon": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        }
-      }
-    },
-    "ReleaseElement": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "namespace": {
-          "type": "string"
-        },
-        "revision": {
-          "type": "string"
-        },
-        "updated": {
-          "type": "string"
-        },
-        "status": {
-          "type": "string"
-        },
-        "chart": {
-          "type": "string"
-        },
-        "app_version": {
-          "type": "string"
-        }
-      }
-    },
-    "ServiceInstanceConfig": {
-      "type": "object",
-      "properties": {
-        "uuid": {
-          "type": "string"
-        },
-        "cartId": {
-          "type": "string"
-        },
-        "transactionId": {
-          "type": "string"
-        },
-        "subscriptionId": {
-          "type": "string"
-        },
-        "userId": {
-          "type": "string"
-        },
-        "datacenterCode": {
-          "type": "string"
-        },
-        "servicePackageName": {
-          "type": "string"
-        },
-        "servicePackagePlanName": {
-          "type": "string"
-        },
-        "servicePackagePnInfo": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ConfigServicePnInfo"
-          }
-        },
-        "servicePackageId": {
-          "type": "string"
-        },
-        "servicePackageOrderId": {
-          "type": "string"
-        },
-        "servicePackageCategory": {
-          "type": "string"
-        },
-        "clusterName": {
-          "type": "string"
-        },
-        "workspaceId": {
-          "type": "string"
-        },
-        "workspaceName": {
-          "type": "string"
-        },
-        "namespaceName": {
-          "type": "string"
-        },
-        "deliverType": {
-          "type": "string"
-        },
-        "memberType": {
-          "type": "string"
-        },
-        "totalPriceByListing": {
-          "type": "number"
-        },
-        "totalPriceByMemberType": {
-          "type": "number"
-        },
-        "proratedPriceByMemberType": {
-          "type": "number"
-        },
-        "isFinished": {
-          "type": "boolean"
-        },
-        "serviceInfo": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ConfigServiceInfo"
-          }
-        },
-        "createdAt": {
-          "type": "string"
-        },
-        "updatedAt": {
-          "type": "string"
-        },
-        "deletedAt": {
-          "type": "string"
-        }
-      }
-    },
-    "ConfigServiceInfo": {
-      "type": "object",
-      "properties": {
-        "pnInfo": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ConfigServicePnInfo"
-          }
-        },
-        "deliverType": {
-          "type": "string"
-        },
-        "orderId": {
-          "type": "string"
-        },
-        "serviceIntanceId": {
-          "type": "string"
-        },
-        "serviceInstanceName": {
-          "type": "string"
-        },
-        "serviceInstanceQuota": {
-          "type": "string"
-        },
-        "serviceName": {
-          "type": "string"
-        },
-        "serviceCategory": {
-          "type": "string"
-        },
-        "servicePlanName": {
-          "type": "string"
-        },
-        "serviceProperty": {
-          "type": "string"
-        },
-        "serviceParameters": {
-          "type": "object"
-        }
-      }
-    },
-    "ConfigServicePnInfo": {
-      "type": "object",
-      "properties": {
-        "pn": {
-          "type": "string"
-        },
-        "pnQuantity": {
-          "type": "number"
-        },
-        "pnProperty": {
-          "type": "string"
-        },
-        "pnPriceByListing": {
-          "type": "number"
-        },
-        "pnPriceByMemberType": {
-          "type": "number"
-        },
-        "pnProratedPriceByMemberType": {
-          "type": "number"
-        },
-        "isTrialAccount": {
-          "type": "boolean"
-        },
-        "availableDays": {
-          "type": "number"
-        },
-        "chargeType": {
-          "type": "string"
-        },
-        "memberType": {
-          "type": "string"
-        },
-        "createdTime": {
-          "type": "string"
-        },
-        "effectiveTime": {
-          "type": "string"
-        }
-      }
-    },
-    "AppServiceInstance": {
-      "type": "object",
-      "properties": {
-        "serviceInstanceId": {
-          "type": "string"
-        },
-        "configurationId": {
-          "type": "string"
-        },
-        "transactionId": {
-          "type": "string"
-        },
-        "serviceInstanceName": {
-          "type": "string"
-        },
-        "serviceCategory": {
-          "type": "string"
-        },
-        "serviceName": {
-          "type": "string"
-        },
-        "servicePlanName": {
-          "type": "string"
-        },
-        "serviceProperty": {
-          "type": "string"
-        },
-        "totalPrice": {
-          "type": "number"
-        },
-        "proratedPrice": {
-          "type": "number"
-        },
-        "availableDays": {
-          "type": "number"
-        },
-        "serviceInstanceQuota": {
-          "type": "string"
-        },
-        "pnInfo": {
-          "type": "string"
-        },
-        "memberType": {
-          "type": "string"
-        },
-        "spaceRequiredInfo": {
-          "type": "object",
-          "properties": {
-            "cpu": {
-              "type": "number"
-            },
-            "memory": {
-              "type": "number"
-            },
-            "ephemeralStorage": {
-              "type": "number"
-            }
-          }
-        },
-        "chargeType": {
-          "type": "string"
-        },
-        "datacenter": {
-          "type": "string"
-        },
-        "datacenterCode": {
-          "type": "string"
-        },
-        "clusterName": {
-          "type": "string"
-        },
-        "workspaceId": {
-          "type": "string"
-        },
-        "workspaceName": {
-          "type": "string"
-        },
-        "namespaceName": {
-          "type": "string"
-        },
-        "userId": {
-          "type": "string"
-        },
-        "buyType": {
-          "type": "string"
-        },
-        "subscriptionId": {
-          "type": "string"
-        },
-        "appServiceInfo": {
-          "type": "object",
-          "$ref": "#/definitions/AppServiceInfo"
-        },
-        "dataService": {
-          "type": "object",
-          "$ref": "#/definitions/DataServiceInfo"
-        },
-        "lifecycleStatus": {
-          "type": "string"
-        },
-        "deployStatus": {
-          "type": "string"
-        },
-        "icon": {
-          "type": "string"
-        },
-        "description": {
-          "type": "string"
-        },
-        "createdAt": {
-          "type": "string"
-        },
-        "updatedAt": {
-          "type": "string"
-        },
-        "deletedAt": {
-          "type": "string"
-        },
-        "cleanedAt": {
-          "type": "string"
-        }
-      }
-    },
-    "AppServiceInfo": {
-      "type": "object",
-      "properties": {
-        "chartname": {
-          "type": "string"
-        },
-        "chartVersion": {
-          "type": "string"
-        },
-        "portalUrlPrefix": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "cpu": {
-          "type": "number"
-        },
-        "memory": {
-          "type": "number"
-        },
-        "ephemeralStorage": {
-          "type": "number"
-        },
-        "dependencyServices": {
-          "type": "object",
-          "properties": {
-            "dataServices": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/AppDependencyDataServiceInfo"
-              }
-            }
-          }
-        },
-        "valuesKeyOverride": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "key": {
-                "type": "string"
-              },
-              "value": {
-                "type": "string"
-              }
-            }
-          }
-        }
-      }
-    },
-    "DataServiceInfo": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "$ref": "#/definitions/AppDependencyDataServiceInfo"
-      }
-    },
-    "AppDependencyDataServiceInfo": {
-      "type": "object",
-      "properties": {
-        "planName": {
-          "type": "string"
-        },
-        "serviceName": {
-          "type": "string"
-        },
-        "serviceInstanceId": {
-          "type": "string"
-        },
-        "ServiceInstanceName": {
-          "type": "string"
-        },
-        "groupName": {
-          "type": "string"
-        }
-      }
-    },
-    "AppDependencyAppServiceInfo": {
-      "type": "object",
-      "properties": {
-        "chartname": {
-          "type": "string"
-        },
-        "chartVersion": {
-          "type": "string"
-        },
-        "plan": {
-          "type": "string"
-        },
-        "PnQuantity": {
-          "type": "string"
-        },
-        "pn": {
-          "type": "string"
-        },
-        "serviceName": {
-          "type": "string"
-        },
-        "version": {
-          "type": "string"
-        },
-        "serviceCategory": {
-          "type": "string"
-        },
-        "portalUrlPrefix": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "cpu": {
-          "type": "number"
-        },
-        "memory": {
-          "type": "number"
-        },
-        "ephemeralStorage": {
-          "type": "number"
-        },
-        "dependencyServices": {
-          "type": "object",
-          "properties": {
-            "dataServices": {
-              "type": "object",
-              "$ref": "#/definitions/DataServiceInfo"
-            }
-          }
-        },
-        "valuesKeyOverride": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "key": {
-                "type": "string"
-              },
-              "value": {
-                "type": "string"
-              }
-            }
-          }
-        }
-      }
-    },
-    "AppServiceInstanceLog": {
+    "dailyNotes": {
       "type": "object",
       "properties": {
         "id": {
-          "type": "integer"
+          "type": "string"
         },
-        "appServiceInstanceId": {
+        "date": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "note": {
+          "type": "string"
+        },
+        "level": {
           "type": "string"
         },
         "type": {
-          "type": "string"
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         },
-        "serviceName": {
-          "type": "string"
-        },
-        "serviceInstanceName": {
-          "type": "string"
-        },
-        "serviceCategroy": {
-          "type": "string"
-        },
-        "datacenterCode": {
-          "type": "string"
-        },
-        "clusterName": {
-          "type": "string"
-        },
-        "workspaceId": {
-          "type": "string"
-        },
-        "namespaceName": {
-          "type": "string"
-        },
-        "appVersion": {
-          "type": "string"
-        },
-        "dbOpertaionAppName": {
-          "type": "string"
-        },
-        "method": {
-          "type": "string"
-        },
-        "status": {
-          "type": "string"
-        },
-        "message": {
-          "type": "string"
+        "rawData": {
+          "type": "object",
+          "properties": {
+            "isStart": {
+              "type": "boolean"
+            },
+            "isEnd": {
+              "type": "boolean"
+            }
+          }
         },
         "createdAt": {
           "type": "string"
         },
         "updatedAt": {
           "type": "string"
+        },
+        "deletedAt": {
+          "type": "string"
         }
       }
     },
-    "ServiceInstanceCanUpdate": {
+    "dailyNotesCreate": {
       "type": "object",
       "properties": {
-        "serviceInstanceId": {
+        "date": {
           "type": "string"
         },
-        "canUpdate": {
-          "type": "boolean"
-        },
-        "reason": {
+        "title": {
           "type": "string"
         },
-        "currentVersion": {
+        "note": {
           "type": "string"
         },
-        "versionList": {
+        "level": {
+          "type": "string"
+        },
+        "type": {
           "type": "array",
           "items": {
             "type": "string"
           }
         },
-        "allowVersionList": {
+        "rawData": {
+          "type": "object",
+          "properties": {
+            "isStart": {
+              "type": "boolean"
+            },
+            "isEnd": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    },
+    "dailyNotesUpdate": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "note": {
+          "type": "string"
+        },
+        "level": {
+          "type": "string"
+        },
+        "type": {
           "type": "array",
           "items": {
             "type": "string"
           }
+        },
+        "rawData": {
+          "type": "object",
+          "properties": {
+            "isStart": {
+              "type": "boolean"
+            },
+            "isEnd": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    },
+    "dailyNotesResponse": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/dailyNotes"
+          }
+        },
+        "error": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "status": {
+          "type": "number"
+        },
+        "timestamp": {
+          "type": "number"
         }
       }
     }
