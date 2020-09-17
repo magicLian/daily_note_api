@@ -12,6 +12,8 @@ func GetDailyNotes(dnQueryReq *models.DailyNoteQueryReq) ([]*models.DailyNote, e
 }
 
 func CreateDailyNotes(dnList []*models.DailyNote) error {
+	mapDate := map[string]int{}
+
 	for _, dn := range dnList {
 		b, err := db.PGDB.ExistDailyNote(dn)
 		if err != nil {
@@ -20,6 +22,12 @@ func CreateDailyNotes(dnList []*models.DailyNote) error {
 		if b {
 			log.Errorf("create daily note failed, reason: dailyNote already exist, date is:[%s]", dn.Date)
 			return models.DailyNoteExist
+		}
+		if _, ok := mapDate[dn.Date]; !ok {
+			mapDate[dn.Date] = 1
+		} else {
+			log.Errorf("create daily note failed, reason: duplicated dailyNote")
+			return models.DailyNoteDulicated
 		}
 	}
 
@@ -37,18 +45,29 @@ func CreateDailyNotes(dnList []*models.DailyNote) error {
 }
 
 func UpdateDailyNotes(dnNewList []*models.DailyNote) error {
-	tx := db.PGDB.Connection.Begin()
+	mapDate := map[string]string{}
 
 	for _, dnNew := range dnNewList {
+		if _, ok := mapDate[dnNew.Date]; !ok {
+			mapDate[dnNew.Date] = dnNew.ID
+		} else {
+			log.Errorf("update daily note failed, reason: duplicate dailyNote")
+			return models.DailyNoteDulicated
+		}
+
 		dnTarget, err := db.PGDB.FindDailyNoteById(dnNew.ID)
 		if err != nil {
 			return err
+		}
+		if dnTarget == nil {
+			return models.DailyNoteNotFound
 		}
 		if dnNew.Date != dnTarget.Date {
 			return models.DailyNoteUpdateConfict
 		}
 	}
 
+	tx := db.PGDB.Connection.Begin()
 	if err := db.PGDB.BatchUpdateDailyNotesWithTx(tx, dnNewList); err != nil {
 		tx.Rollback()
 		return err

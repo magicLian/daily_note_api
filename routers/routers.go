@@ -38,7 +38,7 @@ func InitRouter() *gin.Engine {
 		dnC := new(controllers.DailyNoteC)
 		dn.GET("", dnC.GetDailyNotes)
 		dn.POST("", dnC.CreateDailyNotes)
-		dn.PUT("/:id", dnC.UpdateDailyNotes)
+		dn.PUT("", dnC.UpdateDailyNotes)
 		dn.DELETE("/:id", dnC.DeleteDailyNotes)
 	}
 

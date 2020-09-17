@@ -54,7 +54,13 @@ func (pg *PGService) UpdateDailyNoteWithTx(tx *gorm.DB, dn *models.DailyNote) er
 	if err := changeDailyNoteToString(dn); err != nil {
 		return err
 	}
-	if err := tx.Update(&dn).Error; err != nil {
+	if err := tx.Model(&dn).Updates(map[string]interface{}{
+		"title":    dn.Title,
+		"note":     dn.Note,
+		"type_str": dn.TypeStr,
+		"raw_data": dn.RawData,
+		"level":    dn.Level,
+	}).Error; err != nil {
 		return err
 	}
 
@@ -91,7 +97,7 @@ func (pg *PGService) BatchDeleteDailyNoteByIdWithTx(tx *gorm.DB, idArr []string)
 
 func (pg *PGService) FindDailyNoteById(id string) (*models.DailyNote, error) {
 	dn := &models.DailyNote{}
-	if err := pg.Connection.Where("id = ?", id).First(&dn); err != nil {
+	if err := pg.Connection.Where("id = ?", id).First(&dn); err.Error != nil {
 		if err.RecordNotFound() {
 			return nil, nil
 		} else {

@@ -69,12 +69,6 @@ func (dnC *DailyNoteC) CreateDailyNotes(c *gin.Context) {
 }
 
 func (dnC *DailyNoteC) UpdateDailyNotes(c *gin.Context) {
-	id := c.Param("id")
-	if id == "" {
-		util.HttpResult(c, http.StatusBadRequest, models.DailyNoteIdNotFound, nil)
-		return
-	}
-
 	dnNewList := make([]*models.DailyNote, 0)
 	if err := c.BindJSON(&dnNewList); err != nil {
 		log.Errorf(err.Error())
@@ -82,6 +76,10 @@ func (dnC *DailyNoteC) UpdateDailyNotes(c *gin.Context) {
 		return
 	}
 	for _, dnNew := range dnNewList {
+		if dnNew.ID == "" {
+			util.HttpResult(c, http.StatusBadRequest, models.DailyNoteIdNotFound, nil)
+			return
+		}
 		if dnNew.Date == "" {
 			util.HttpResult(c, http.StatusBadRequest, models.DailyNoteParseFailed, nil)
 			return

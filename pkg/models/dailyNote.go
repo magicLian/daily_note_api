@@ -13,6 +13,7 @@ var (
 	DailyNoteNotFound           = errors.New("daily note not found")
 	DailyNoteUpdateConfict      = errors.New("daily note update confict")
 	DailyNoteUpdateFailed       = errors.New("daily note update failed")
+	DailyNoteDulicated          = errors.New("duplicated dailyNotes")
 	DailyQueryParametersInvaild = errors.New("daily note query parameters invaild")
 )
 
