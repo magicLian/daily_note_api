@@ -100,7 +100,7 @@ func (dnC *DailyNoteC) UpdateDailyNotes(c *gin.Context) {
 	util.Response(c, err, dnNewList, int64(len(dnNewList)))
 }
 
-func (dnC *DailyNoteC) DeleteDailyNote(c *gin.Context) {
+func (dnC *DailyNoteC) DeleteDailyNotes(c *gin.Context) {
 	idStr := c.Param("id")
 	if idStr == "" {
 		util.HttpResult(c, http.StatusBadRequest, models.DailyNoteIdNotFound, nil)
