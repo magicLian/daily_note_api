@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-docker build -t harbor.arfa.wise-paas.com/appbuy/appbuy-api:1.4.0.11 .
-docker push harbor.arfa.wise-paas.com/appbuy/appbuy-api:1.4.0.11
+docker build -t registry.cn-hangzhou.aliyuncs.com/magiclian/daily_note:0.0.0.1 .
+docker push registry.cn-hangzhou.aliyuncs.com/magiclian/daily_note:0.0.0.1
